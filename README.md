@@ -7,7 +7,7 @@
 
 # GDGist Community Edition
 
-![Godot Version](https://img.shields.io/badge/Godot-4.6+-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Godot Version](https://img.shields.io/badge/Godot-4.6+-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg) ![Version](https://img.shields.io/badge/GDGist_Version-2606.3-orange)
 
 GDGist is a deeply integrated IDE Code Snippet Manager built specifically for the Godot Engine (version 4.6 and above). It is engineered for veteran developers to eliminate repetitive boilerplate code by providing robust, contextual workflow automation directly within the Godot editor. 
 
