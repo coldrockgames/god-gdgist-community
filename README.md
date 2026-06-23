@@ -48,7 +48,7 @@ This plugin is not meant to run in an exported game, as it is an extension to th
 
 ## Upgrading to Pro
 
-The GDGist architecture utilizes a data-driven Feature Broker (`GdgistFeatureBroker`) to dynamically manage execution logic. For developers requiring advanced automation, a premium **Pro Edition** upgrade is available via [itch.io](https://coldrockgames.itch.io/gdgist).
+For developers requiring advanced automation, a premium **Pro Edition** upgrade is available via [itch.io](https://coldrockgames.itch.io/gdgist).
 
 The Pro Edition seamlessly unlocks the following features:
 
