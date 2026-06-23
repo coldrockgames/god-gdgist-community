@@ -3,7 +3,7 @@
 </p>
 
 > [!NOTE]  
-> This repository is under construction and currently built for the release of our plugin!
+> This repository is under construction and currently being built up for the release of the plugin!
 
 > [!NOTE]
 > **Giving Back to the Engine:** As a passionate Godot developer, I am pledging **20% of all GDGist Pro net revenues** directly to the [Godot Development Fund](https://fund.godotengine.org/). By upgrading your IDE workflow, you are also actively supporting the future of the engine we all rely on.\
