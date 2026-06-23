@@ -5,6 +5,11 @@
 > [!NOTE]  
 > This repository is under construction and currently built for the release of our plugin!
 
+> [!NOTE]
+> **Giving Back to the Engine:** As a passionate Godot developer, I am pledging **20% of all GDGist Pro net revenues** directly to the [Godot Development Fund](https://fund.godotengine.org/). By upgrading your IDE workflow, you are also actively supporting the future of the engine we all rely on.\
+> *I am not affiliated in any way with the Godot Foundation. This is just my way to say "Thank you" to the makers of Godot!*
+
+
 # GDGist Community Edition
 
 ![Godot Version](https://img.shields.io/badge/Godot-4.6+-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg) ![Version](https://img.shields.io/badge/GDGist_Version-2606.3-orange)
