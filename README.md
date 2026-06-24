@@ -6,6 +6,8 @@
 > **Giving Back to the Engine:** As a passionate Godot developer, I am pledging **20% of all GDGist Pro net revenues** directly to the [Godot Development Fund](https://fund.godotengine.org/). By upgrading your IDE workflow, you are also actively supporting the future of the engine we all rely on.\
 > *I am not affiliated in any way with the Godot Foundation. This is just my way to say "Thank you" to the makers of Godot!*
 
+# Wiki Documentation
+Make sure to look at the documentation in the [wiki](https://github.com/coldrockgames/god-gdgist-community/wiki) for a comprehensive explanation of the features of GDGist!
 
 # GDGist Community Edition
 
