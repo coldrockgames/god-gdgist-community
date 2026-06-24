@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://2cgw8vddogi8"]
+
+[ext_resource type="Script" uid="uid://bsl4xc6vxg78j" path="res://addons/coldrock-gdgist/classes/gdgist_dock.gd" id="1_h5dxy"]
+[ext_resource type="Script" uid="uid://bq2d2ogf3rc46" path="res://addons/coldrock-gdgist/classes/tree_control.gd" id="5_f3hwl"]
+
+[sub_resource type="DPITexture" id="DPITexture_pfb7m"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#ff5d5d\" d=\"M2 1v8.586l1.293-1.293a1 1 0 0 1 1.414 0L7 10.587l2.293-2.293a1 1 0 0 1 1.414 0L13 10.586l1-1V6H9V1H2zm8 0v4h4zm-6 9.414-2 2V15h12v-2.586l-.293.293a1 1 0 0 1-1.414 0L10 10.414l-2.293 2.293a1 1 0 0 1-1.414 0L4 10.414z\"/></svg>
+"
+
+[node name="GdGistDock" type="VBoxContainer" unique_id=1196805833]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_h5dxy")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1775887483]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="FilterText" type="LineEdit" parent="HBoxContainer" unique_id=1402481412]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Filter Gists"
+clear_button_enabled = true
+right_icon = SubResource("DPITexture_pfb7m")
+
+[node name="RefreshButton" type="Button" parent="HBoxContainer" unique_id=402890165]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Refresh View"
+icon = SubResource("DPITexture_pfb7m")
+flat = true
+
+[node name="UpgradeButton" type="Button" parent="HBoxContainer" unique_id=94912897]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+tooltip_text = "Get the Pro version
+(Opens a web browser to itch.io)"
+icon = SubResource("DPITexture_pfb7m")
+flat = true
+
+[node name="Tree" type="Tree" parent="." unique_id=2045035324]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+allow_rmb_select = true
+hide_root = true
+select_mode = 2
+script = ExtResource("5_f3hwl")
+
+[connection signal="pressed" from="HBoxContainer/RefreshButton" to="." method="refresh_tree"]
+[connection signal="pressed" from="HBoxContainer/UpgradeButton" to="." method="_on_upgrade_button_pressed"]

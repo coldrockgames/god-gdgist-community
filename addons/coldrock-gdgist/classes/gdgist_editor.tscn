@@ -1,0 +1,126 @@
+[gd_scene format=3 uid="uid://clnjsaqb8td2l"]
+
+[ext_resource type="Script" uid="uid://cpjstamcpemag" path="res://addons/coldrock-gdgist/classes/gdgist_editor.gd" id="1_2hbrg"]
+
+[sub_resource type="GDScriptSyntaxHighlighter" id="GDScriptSyntaxHighlighter_2hbrg"]
+
+[sub_resource type="DPITexture" id="DPITexture_2hbrg"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#ff5d5d\" d=\"M2 1v8.586l1.293-1.293a1 1 0 0 1 1.414 0L7 10.587l2.293-2.293a1 1 0 0 1 1.414 0L13 10.586l1-1V6H9V1H2zm8 0v4h4zm-6 9.414-2 2V15h12v-2.586l-.293.293a1 1 0 0 1-1.414 0L10 10.414l-2.293 2.293a1 1 0 0 1-1.414 0L4 10.414z\"/></svg>
+"
+
+[node name="GDGistEditor" type="ConfirmationDialog" unique_id=1681626101]
+oversampling_override = 1.0
+title = "Gist Editor"
+position = Vector2i(266, 65)
+size = Vector2i(800, 600)
+maximize_disabled = false
+ok_button_text = "  Save Gist  "
+dialog_close_on_escape = false
+cancel_button_text = "  Cancel  "
+script = ExtResource("1_2hbrg")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=9174700]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -44.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="hboName" type="HBoxContainer" parent="VBoxContainer" unique_id=462634975]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="VBoxContainer/hboName" unique_id=625605422]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Name:"
+
+[node name="GistName" type="LineEdit" parent="VBoxContainer/hboName" unique_id=1375083803]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Name your Gist... You may use paths to create a structure like 'ui/buttons/click'"
+
+[node name="hboClass" type="HBoxContainer" parent="VBoxContainer" unique_id=265771026]
+layout_mode = 2
+
+[node name="ClassLabel" type="Label" parent="VBoxContainer/hboClass" unique_id=19227036]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Inherits:"
+
+[node name="ClassName" type="LineEdit" parent="VBoxContainer/hboClass" unique_id=564377248]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Parent Class Name (optional)"
+
+[node name="hboClass2" type="HBoxContainer" parent="VBoxContainer" unique_id=1664730005]
+layout_mode = 2
+
+[node name="ScopeLabel" type="Label" parent="VBoxContainer/hboClass2" unique_id=1485364163]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Scope:"
+
+[node name="ScopeInfo" type="Label" parent="VBoxContainer/hboClass2" unique_id=1006507970]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "-"
+
+[node name="CodeEdit" type="CodeEdit" parent="VBoxContainer" unique_id=1922863978]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+syntax_highlighter = SubResource("GDScriptSyntaxHighlighter_2hbrg")
+highlight_all_occurrences = true
+highlight_current_line = true
+draw_tabs = true
+line_folding = true
+gutters_draw_line_numbers = true
+code_completion_enabled = true
+indent_automatic = true
+
+[node name="ConsoleWrapper" type="VBoxContainer" parent="VBoxContainer" unique_id=1381959365]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+tooltip_text = "Requires the GDGist Pro Edition"
+metadata/p_editor_scripts = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/ConsoleWrapper" unique_id=532115138]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/ConsoleWrapper/HBoxContainer" unique_id=1716511474]
+layout_mode = 2
+text = "Console Output"
+
+[node name="Control" type="Control" parent="VBoxContainer/ConsoleWrapper/HBoxContainer" unique_id=843369811]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ConsoleClear" type="Button" parent="VBoxContainer/ConsoleWrapper/HBoxContainer" unique_id=516537687]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Clear the Console View"
+icon = SubResource("DPITexture_2hbrg")
+flat = true
+
+[node name="ConsoleClose" type="Button" parent="VBoxContainer/ConsoleWrapper/HBoxContainer" unique_id=774407126]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Close the Console View"
+icon = SubResource("DPITexture_2hbrg")
+flat = true
+
+[node name="Console" type="TextEdit" parent="VBoxContainer/ConsoleWrapper" unique_id=933370492]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+editable = false
+
+[connection signal="pressed" from="VBoxContainer/ConsoleWrapper/HBoxContainer/ConsoleClose" to="." method="_on_console_close_pressed"]
