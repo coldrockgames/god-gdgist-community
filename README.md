@@ -2,9 +2,6 @@
 <img src="https://github.com/coldrockgames/god-gdgist-community/blob/ccf4463b456430992316b7ed6536587c184de2c5/assets/gdgist-logo-trans-256.png"/>
 </p>
 
-> [!NOTE]  
-> This repository is under construction and currently being built up for the release of the plugin!
-
 > [!NOTE]
 > **Giving Back to the Engine:** As a passionate Godot developer, I am pledging **20% of all GDGist Pro net revenues** directly to the [Godot Development Fund](https://fund.godotengine.org/). By upgrading your IDE workflow, you are also actively supporting the future of the engine we all rely on.\
 > *I am not affiliated in any way with the Godot Foundation. This is just my way to say "Thank you" to the makers of Godot!*
