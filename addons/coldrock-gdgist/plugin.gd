@@ -61,14 +61,6 @@ var SETTINGS := {
 		"hint": PROPERTY_HINT_FILE,
 		"hint_string": "*.tres,*.res"
 	},
-	"paths/global_gists": {
-		"editor": true,
-		"default": GLOBAL_GIST_DEFAULT_PATH,
-		"type": TYPE_STRING,  
-		"hint": PROPERTY_HINT_GLOBAL_DIR,
-		"hint_string": ""
-	},
-	
 }
 
 # Definition of all autoload singletons.
