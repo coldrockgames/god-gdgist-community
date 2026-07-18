@@ -89,14 +89,21 @@ var _quick_pick_instance:Control
 
 
 #region pro edition init
-## Dynamically loads the pro initialization script if it exists and injects its features.
-func _inject_pro_features() -> void:
+func _detect_pro_version() -> bool:
+	is_pro_version = true
 	if not FileAccess.file_exists(PRO_INIT_PATH):
-		return
+		is_pro_version = false
 	var pro_script := load(PRO_INIT_PATH) as GDScript
 	if not pro_script:
+		is_pro_version = false
+	return is_pro_version
+
+
+## Dynamically loads the pro initialization script if it exists and injects its features.
+func _inject_pro_features() -> void:
+	if not _detect_pro_version():
 		return
-	is_pro_version = true
+	var pro_script := load(PRO_INIT_PATH) as GDScript
 	var pro_module:Variant = pro_script.new()
 	if pro_module.has_method("register_pro_features"):
 		pro_module.register_pro_features()
@@ -120,8 +127,10 @@ static func get_default_global_path() -> String:
 
 
 func _enter_tree() -> void:
-	_inject_pro_features()
+	_detect_pro_version()
+	var sw := StopWatch.new("Coldrock " + PLUGIN_NAME + (" Pro" if is_pro_version else ""))
 	# Do not remove these!
+	_inject_pro_features()
 	GdGistManager.load_ui_state()
 	_prepare_settings()
 	_prepare_autoloads()
@@ -131,7 +140,7 @@ func _enter_tree() -> void:
 	_add_dock_panel()
 	_setup_export_plugin()
 	get_editor_dimensions()
-	print("Coldrock ", PLUGIN_NAME, " Pro" if is_pro_version else "" , " plugin activated.")
+	sw.finish("plugin initialized in")
 
 
 func _exit_tree() -> void:
@@ -441,6 +450,10 @@ func _insert_snippet_to_editor(content:String, line:int, col:int) -> void:
 	var code_edit := _get_code_editor()
 	var data := _process_placeholders(content)
 	if code_edit:
+		if Input.is_key_pressed(KEY_CTRL):
+			code_edit.text = content
+			code_edit.grab_focus()
+			return
 		code_edit.begin_complex_operation()
 		code_edit.insert_text(data.clean_text, line, col)
 		if data.offset != -1:
@@ -551,10 +564,14 @@ class GdGistContextMenu extends EditorContextMenuPlugin:
 		var extractor_script := load(PRO_EXTRACTOR_PATH) as GDScript
 		if not extractor_script:
 			return
-		var res:Array[Dictionary] = extractor_script.call("extract_virtuals", selected_text)
-		var foldername:String = extractor_script.call("determine_extraction_folder", selected_text)
+		var virtuals:Array[Dictionary] = extractor_script.call("extract_virtuals", selected_text)
+		var exports:Array[Dictionary] = extractor_script.call("extract_exports", selected_text)
+		var tree_folder:String = _plugin._dock_content.tree.get_active_folder_path()
+		if not tree_folder.is_empty() and not tree_folder.ends_with("/"):
+			tree_folder += "/"
+		var foldername:String = tree_folder + extractor_script.call("determine_extraction_folder", selected_text)
 		if _plugin._extractor_dialog and _plugin._extractor_dialog.has_method("open_for_extraction"):
-			await _plugin._extractor_dialog.call("open_for_extraction", res, foldername)
+			await _plugin._extractor_dialog.call("open_for_extraction", virtuals, exports, foldername)
 			_plugin._dock_content.refresh_tree()
 
 

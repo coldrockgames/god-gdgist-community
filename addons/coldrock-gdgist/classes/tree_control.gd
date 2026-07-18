@@ -18,6 +18,7 @@ enum TreeMenuId {
 	RENAME_GIST = 7,
 	DUPLICATE_GIST = 8,
 	RENAME_FOLDER = 9,
+	COPY_CODE = 10,
 }
 
 var _tree_menu: PopupMenu
@@ -260,19 +261,19 @@ func _get_folder_info(item: TreeItem) -> Dictionary:
 #endregion
 
 #region drag & drop
-func _get_drag_data(at_position: Vector2) -> Variant:
-	var item: TreeItem = get_item_at_position(at_position)
-	if not item:
-		return null
-	var meta: Variant = item.get_metadata(0)
-	if typeof(meta) != TYPE_DICTIONARY:
-		return null
-	var drag_data = meta.duplicate()
-	drag_data["type"] = "gdgist"
-	var preview := Label.new()
-	preview.text = "Move: " + item.get_text(0)
-	set_drag_preview(preview)
-	return drag_data
+#func _get_drag_data(at_position: Vector2) -> Variant:
+	#var item: TreeItem = get_item_at_position(at_position)
+	#if not item:
+		#return null
+	#var meta: Variant = item.get_metadata(0)
+	#if typeof(meta) != TYPE_DICTIONARY:
+		#return null
+	#var drag_data = meta.duplicate()
+	#drag_data["type"] = "gdgist"
+	#var preview := Label.new()
+	#preview.text = "Move: " + item.get_text(0)
+	#set_drag_preview(preview)
+	#return drag_data
 
 
 func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
@@ -375,6 +376,8 @@ func _on_item_mouse_selected(pos: Vector2, button: int) -> void:
 			_tree_menu.add_icon_item(get_theme_icon("Rename", "EditorIcons"), "Rename Gist", TreeMenuId.RENAME_GIST)
 			_tree_menu.add_icon_item(get_theme_icon("Duplicate", "EditorIcons"), "Duplicate Gist", TreeMenuId.DUPLICATE_GIST)
 			_tree_menu.add_separator()
+			_tree_menu.add_icon_item(get_theme_icon("ActionCopy", "EditorIcons"), "Copy Gist Code", TreeMenuId.COPY_CODE)
+			_tree_menu.add_separator()
 			var code:String = meta.get("code", "")
 			if code.contains("extends EditorScript") and code.contains("func _run"):
 				_tree_menu.add_icon_item(get_theme_icon("Play", "EditorIcons"), "Run EditorScript", TreeMenuId.RUN_EDITOR_SCRIPT)
@@ -466,6 +469,13 @@ func _on_tree_menu_id_pressed(id:int) -> void:
 			_duplicate_dialog.popup_centered()
 			_duplicate_edit.grab_focus()
 			_duplicate_edit.select_all()
+		TreeMenuId.COPY_CODE:
+			var meta:Variant = _action_target_item.get_metadata(0)
+			if typeof(meta) == TYPE_DICTIONARY:
+				var code:String = meta.get("code", "")
+				if code != "":
+					DisplayServer.clipboard_set(code)
+					IDE.toast_info("Code copied to the clipboard.")
 
 
 func _on_rename_edit_text_submitted(_text: String) -> void:
