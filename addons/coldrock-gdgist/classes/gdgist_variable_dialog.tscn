@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://chrbclm4u4g27"]
+
+[ext_resource type="Script" uid="uid://chggbofewlpfl" path="res://addons/coldrock-gdgist/classes/gdgist_variable_dialog.gd" id="1_1qi5t"]
+
+[node name="GdgistVariableDialog" type="ConfirmationDialog" unique_id=267834789]
+oversampling_override = 1.0
+title = "Define Snippet Variables"
+script = ExtResource("1_1qi5t")

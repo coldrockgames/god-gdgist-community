@@ -85,6 +85,7 @@ var _dock_content:VBoxContainer
 var _editor_dialog: GdGistEditor
 var _extractor_dialog:ConfirmationDialog
 var _context_menu_plugin:GdGistContextMenu
+var _variable_dialog: GdGistVariableDialog
 var _quick_pick_instance:Control
 
 
@@ -298,6 +299,9 @@ func _add_dock_panel() -> void:
 	if GdgistFeatureBroker.has_feature("p_extractor"):
 		_extractor_dialog = load("res://addons/coldrock-gdgist/pro/gdgist_extractor.tscn").instantiate()
 		EditorInterface.get_base_control().add_child(_extractor_dialog)
+	# The variable dialog
+	_variable_dialog = load("res://addons/coldrock-gdgist/classes/gdgist_variable_dialog.tscn").instantiate()
+	EditorInterface.get_base_control().add_child(_variable_dialog)
 	# The dock panel
 	_dock = EditorDock.new()
 	_dock.title = "GDGist"
@@ -322,6 +326,9 @@ func _remove_dock_panel() -> void:
 	if _extractor_dialog:
 		_extractor_dialog.queue_free()
 		_extractor_dialog = null
+	if _variable_dialog:
+		_variable_dialog.queue_free()
+		_variable_dialog = null
 	if _context_menu_plugin:
 		remove_context_menu_plugin(_context_menu_plugin)
 		_context_menu_plugin = null
@@ -446,38 +453,60 @@ func _get_code_editor() -> CodeEdit:
 	return current_editor.get_base_editor() as CodeEdit
 
 
-func _insert_snippet_to_editor(content:String, line:int, col:int) -> void:
+func _insert_snippet_to_editor(content: String, line: int, col: int) -> void:
 	var code_edit := _get_code_editor()
-	var data := _process_placeholders(content)
-	if code_edit:
-		if Input.is_key_pressed(KEY_CTRL):
-			code_edit.text = content
-			code_edit.grab_focus()
-			return
-		code_edit.begin_complex_operation()
-		code_edit.insert_text(data.clean_text, line, col)
-		if data.offset != -1:
-			var text_before_marker:String = data.clean_text.left(data.offset)
-			var lines_before := text_before_marker.split("\n")
-			var target_line := line + lines_before.size() - 1
-			var target_col := lines_before[-1].length()
-			if lines_before.size() == 1:
-				target_col += col
-			if data.length > 0:
-				var selected_text:String = data.clean_text.substr(data.offset, data.length)
-				var lines_in_sel := selected_text.split("\n")
-				var end_line := target_line + lines_in_sel.size() - 1
-				var end_col := lines_in_sel[-1].length()
-				if lines_in_sel.size() == 1:
-					end_col += target_col
-				code_edit.select(target_line, target_col, end_line, end_col)
-				code_edit.set_caret_line(end_line)
-				code_edit.set_caret_column(end_col)
-			else:
-				code_edit.set_caret_line(target_line)
-				code_edit.set_caret_column(target_col)
-		code_edit.end_complex_operation()
+	if not code_edit:
+		return
+	if Input.is_key_pressed(KEY_CTRL):
+		code_edit.text = content
 		code_edit.grab_focus()
+		return
+	var regex := RegEx.new()
+	regex.compile(r"!>(.*?)<!")
+	var matches := regex.search_all(content)
+	var var_counts := {}
+	for m in matches:
+		var v := m.get_string(1)
+		var_counts[v] = var_counts.get(v, 0) + 1
+	var needs_dialog := false
+	if var_counts.size() > 1:
+		needs_dialog = true
+	elif var_counts.size() == 1 and var_counts.values()[0] > 1:
+		needs_dialog = true
+	var final_content := content
+	if needs_dialog:
+		var unique_vars: Array[String] = []
+		unique_vars.assign(var_counts.keys())
+		var replacements: Dictionary = await _variable_dialog.request_variables(unique_vars, final_content)
+		if replacements.is_empty():
+			return # Workflow aborted by user
+		for v in replacements:
+			final_content = final_content.replace("!>" + v + "<!", replacements[v])
+	var data := _process_placeholders(final_content)
+	code_edit.begin_complex_operation()
+	code_edit.insert_text(data.clean_text, line, col)
+	if data.offset != -1:
+		var text_before_marker: String = data.clean_text.left(data.offset)
+		var lines_before := text_before_marker.split("\n")
+		var target_line := line + lines_before.size() - 1
+		var target_col := lines_before[-1].length()
+		if lines_before.size() == 1:
+			target_col += col
+		if data.length > 0:
+			var selected_text: String = data.clean_text.substr(data.offset, data.length)
+			var lines_in_sel := selected_text.split("\n")
+			var end_line := target_line + lines_in_sel.size() - 1
+			var end_col := lines_in_sel[-1].length()
+			if lines_in_sel.size() == 1:
+				end_col += target_col
+			code_edit.select(target_line, target_col, end_line, end_col)
+			code_edit.set_caret_line(end_line)
+			code_edit.set_caret_column(end_col)
+		else:
+			code_edit.set_caret_line(target_line)
+			code_edit.set_caret_column(target_col)
+	code_edit.end_complex_operation()
+	code_edit.grab_focus()
 
 
 func _process_placeholders(text:String) -> Dictionary:

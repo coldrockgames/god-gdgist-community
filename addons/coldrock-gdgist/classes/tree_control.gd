@@ -138,7 +138,7 @@ func _highlight_tooltip_text(for_text:String) -> String:
 			var content := m.get_string(2)
 			result += " [bgcolor=#503050][color=whitesmoke]%s[/color][/bgcolor] " % content
 		elif m.get_string(3): # Cursor !!
-			pass
+			result += "[color=darkorchid]|[/color]"
 		elif m.get_string(4): # Region
 			result += "[color=darkorchid]%s[/color]" % m.get_string(4)
 		elif m.get_string(5): # Comments

@@ -105,6 +105,8 @@ func refresh_tree(use_cache:bool = false) -> void:
 		await _populate_scope(global_node, true, use_cache)
 	if not saved_selections.is_empty():
 		_restore_tree_selection(root, saved_selections)
+	await get_tree().process_frame
+	tree.ensure_cursor_is_visible()
 	call_deferred("_apply_ui_state")
 
 
