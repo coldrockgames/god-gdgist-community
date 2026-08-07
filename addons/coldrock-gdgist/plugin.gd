@@ -94,9 +94,10 @@ func _detect_pro_version() -> bool:
 	is_pro_version = true
 	if not FileAccess.file_exists(PRO_INIT_PATH):
 		is_pro_version = false
-	var pro_script := load(PRO_INIT_PATH) as GDScript
-	if not pro_script:
-		is_pro_version = false
+	if is_pro_version:
+		var pro_script := load(PRO_INIT_PATH) as GDScript
+		if not pro_script:
+			is_pro_version = false
 	return is_pro_version
 
 
@@ -581,6 +582,8 @@ class GdGistContextMenu extends EditorContextMenuPlugin:
 
 
 	func _on_extract_interface(data:Variant) -> void:
+		if not GDGistPlugin.is_pro_version:
+			return
 		var code_edit:CodeEdit = null
 		if data is Array and data.size() > 0:
 			code_edit = data[0] as CodeEdit
