@@ -475,7 +475,7 @@ func _on_tree_menu_id_pressed(id:int) -> void:
 				var code:String = meta.get("code", "")
 				if code != "":
 					DisplayServer.clipboard_set(code)
-					IDE.toast_info("Code copied to the clipboard.")
+					EditorInterface.get_editor_toaster().push_toast("Code copied to the clipboard.", EditorToaster.Severity.SEVERITY_INFO)
 
 
 func _on_rename_edit_text_submitted(_text: String) -> void:
