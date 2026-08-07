@@ -224,6 +224,7 @@ func _get_or_create_folder_path(root_node:TreeItem, folder_path:String, is_globa
 
 func _apply_ui_state() -> void:
 	filter_text.text = GdGistManager.ui_state_get_filter()
+	filter_text.caret_column = filter_text.text.length()
 	var root: TreeItem = tree.get_root()
 	if root:
 		_walk_and_apply_state(root)
