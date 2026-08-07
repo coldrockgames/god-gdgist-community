@@ -82,7 +82,7 @@ func _on_folder_created(parent_item: TreeItem, folder_name: String, is_global: b
 	parent_item.collapsed = false
 
 
-func refresh_tree(use_cache:bool = false) -> void:
+func refresh_tree(use_cache:bool = false, focus_key:String = "") -> void:
 	if not is_inside_tree() or _is_loading_state:
 		return
 	_is_loading_state = true
@@ -93,6 +93,8 @@ func refresh_tree(use_cache:bool = false) -> void:
 		if not key.is_empty():
 			saved_selections.append(key)
 		next_item = tree.get_next_selected(next_item)
+	if not focus_key.is_empty():
+		saved_selections.push_front(focus_key)
 	tree.clear()
 	refresh_button.icon = get_theme_icon("Reload", "EditorIcons")
 	upgrade_button.icon = get_theme_icon("ProjectUpgradeMajor", "EditorIcons")
@@ -106,8 +108,10 @@ func refresh_tree(use_cache:bool = false) -> void:
 	if not saved_selections.is_empty():
 		_restore_tree_selection(root, saved_selections)
 	await get_tree().process_frame
+	await get_tree().process_frame
+	await get_tree().process_frame
 	tree.ensure_cursor_is_visible()
-	call_deferred("_apply_ui_state")
+	_apply_ui_state.call_deferred()
 
 
 ## Generates a unique string identifier for any TreeItem based on metadata or hierarchy.
@@ -244,6 +248,8 @@ func _on_tree_item_activated() -> void:
 	if typeof(meta) == TYPE_DICTIONARY:
 		var is_global:bool = meta.get("is_global", false)
 		_editor_dialog.open_for_edit(meta, is_global)
+	else:
+		selected.collapsed = not selected.collapsed
 
 
 func _on_add_button_pressed() -> void:
@@ -300,29 +306,34 @@ func _on_upgrade_button_pressed() -> void:
 #region dragging
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	var selected_gists: Array[Dictionary] = []
+	var selected_folders: Array[Dictionary] = []
 	var current := tree.get_next_selected(null)
 	while current:
-		var metadata = current.get_metadata(0)
+		var metadata:Variant = current.get_metadata(0)
 		if metadata is Dictionary and metadata.has("code"):
 			selected_gists.append(metadata)
+		elif current.get_parent() != null and current.get_parent() != tree.get_root():
+			selected_folders.append(_get_folder_info_for_state(current))
 		current = tree.get_next_selected(current)
-	if selected_gists.is_empty():
+	if selected_gists.is_empty() and selected_folders.is_empty():
 		return null
 	var preview := HBoxContainer.new()
 	var icon := TextureRect.new()
-	icon.texture = get_theme_icon("CodeHighlighter", "EditorIcons")
-	icon.modulate = global_col_file # Oder local_col_file
+	icon.texture = get_theme_icon("Folder" if selected_gists.is_empty() else "CodeHighlighter", "EditorIcons")
+	icon.modulate = global_col_folder 
 	var label := Label.new()
-	if selected_gists.size() > 1:
-		label.text = " %d Gists" % selected_gists.size()
+	var total_items: int = selected_gists.size() + selected_folders.size()
+	if total_items > 1:
+		label.text = " %d Items" % total_items
 	else:
-		label.text = " " + selected_gists[0].get("name", "Gist")
+		label.text = " " + (selected_gists[0].get("name", "Gist") if not selected_gists.is_empty() else selected_folders[0].path.get_file())
 	preview.add_child(icon)
 	preview.add_child(label)
 	set_drag_preview(preview)
 	return {
 		"type": "gdgist",
-		"gists": selected_gists
+		"gists": selected_gists,
+		"folders": selected_folders
 	}
 
 
@@ -340,15 +351,30 @@ func _drop_data_tree(at_position: Vector2, data: Variant) -> void:
 			folder_info = _get_folder_info_for_state(target_item)
 	else:
 		folder_info = {"section": "Project", "path": ""}
-	var target_path:String = folder_info.path
-	var is_global:bool = folder_info.section == "Global"
-	var gists: Array = data.get("gists", [])
+	var target_path: String = folder_info.path
+	var target_is_global: bool = folder_info.section == "Global"
 	var moved_any := false
-	for gist in gists:
-		if gist.get("folder", "") == target_path and gist.get("is_global") == is_global:
+	var folders: Array = data.get("folders", [])
+	for source_folder:Dictionary in folders:
+		var source_is_global: bool = source_folder.section == "Global"
+		var source_path: String = source_folder.path
+		if source_path == target_path and source_is_global == target_is_global:
 			continue
-		GdGistManager.move_gist(gist, is_global, target_path)
+		if source_is_global == target_is_global and (target_path == source_path or target_path.begins_with(source_path + "/")):
+			printerr("Cannot beam a folder into its own subspace anomaly!")
+			continue
+		GdGistManager.move_folder(source_is_global, source_path, target_is_global, target_path)
+		moved_any = true
+	var gists: Array = data.get("gists", [])
+	for gist:Dictionary in gists:
+		if gist.get("folder", "") == target_path and gist.get("is_global", false) == target_is_global:
+			continue
+		GdGistManager.move_gist(gist, target_is_global, target_path)
 		moved_any = true
 	if moved_any:
-		refresh_tree()
+		var scope_prefix: String = "Global Gists" if target_is_global else "Project Gists"
+		var focus_key: String = "folder:/" + scope_prefix
+		if not target_path.is_empty():
+			focus_key += "/" + target_path
+		refresh_tree(false, focus_key)
 #endregion

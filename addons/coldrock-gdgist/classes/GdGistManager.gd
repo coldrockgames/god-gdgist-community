@@ -295,6 +295,46 @@ static func delete_gist(file_path: String) -> bool:
 	if file_path != "" and FileAccess.file_exists(file_path):
 		return DirAccess.remove_absolute(file_path) == OK
 	return false
+
+
+## Moves an entire folder to a new scope or location. Supports seamless folder merging.
+static func move_folder(source_is_global: bool, source_path: String, target_is_global: bool, target_path: String) -> bool:
+	if target_is_global and not GdgistFeatureBroker.has_feature(GdgistFeatureBroker.FEATURE_GLOBAL_GISTS):
+		push_error("GDGist: Moving to Global Gists requires the Pro Edition.")
+		return false
+	var source_base: String = get_global_path() if source_is_global else get_project_path()
+	var abs_source_dir: String = source_base.path_join(source_path)
+	if not DirAccess.dir_exists_absolute(abs_source_dir):
+		push_error("GDGist: Source folder does not exist -> " + abs_source_dir)
+		return false
+	var folder_name: String = source_path.get_file()
+	var target_relative_base: String = target_path.path_join(folder_name)
+	return _move_directory_recursive(abs_source_dir, target_is_global, target_relative_base)
+
+
+## Recursively moves gists and cleans up empty directories.
+static func _move_directory_recursive(abs_source: String, target_is_global: bool, target_relative: String) -> bool:
+	var dir := DirAccess.open(abs_source)
+	if not dir:
+		return false
+	dir.include_hidden = false
+	dir.include_navigational = false
+	var success := true
+	for file_name in dir.get_files():
+		if file_name.ends_with(EXTENSION):
+			var abs_file_path := abs_source.path_join(file_name)
+			var mock_gist: Dictionary = {"file_path": abs_file_path}
+			if not move_gist(mock_gist, target_is_global, target_relative):
+				success = false
+	for sub_dir in dir.get_directories():
+		var next_abs_source := abs_source.path_join(sub_dir)
+		var next_target_relative := target_relative.path_join(sub_dir)
+		if not _move_directory_recursive(next_abs_source, target_is_global, next_target_relative):
+			success = false
+	var err := DirAccess.remove_absolute(abs_source)
+	if err != OK and success:
+		push_warning("GDGist: Could not remove directory (might contain non-gist data): " + abs_source)
+	return success
 #endregion
 
 #region script execution
