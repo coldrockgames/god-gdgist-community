@@ -62,7 +62,7 @@ static func get_project_path() -> String:
 
 ## Retrieves the configured global path or its default.
 static func get_global_path() -> String:
-	if not GdgistFeatureBroker.has_feature(GdgistFeatureBroker.FEATURE_GLOBAL_GISTS):
+	if GdgistFeatureBroker.has_feature(GdgistFeatureBroker.FEATURE_GLOBAL_GISTS):
 		var pro_script := load(GDGistPlugin.PRO_MANAGER_PATH) as GDScript
 		if pro_script and pro_script.has_method("get_global_path"):
 			return pro_script.call("get_global_path")
