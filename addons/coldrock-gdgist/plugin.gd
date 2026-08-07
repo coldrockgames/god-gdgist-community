@@ -4,10 +4,10 @@
 class_name GDGistPlugin
 extends EditorPlugin
 
-const PRO_INIT_PATH      := "res://addons/coldrock-gdgist/pro/GdGistProInit.gd"
-const PRO_MANAGER_PATH   := "res://addons/coldrock-gdgist/pro/GdGistProManager.gd"
-const PRO_RUNNER_PATH    := "res://addons/coldrock-gdgist/pro/GdGistScriptRunner.gd"
-const PRO_EXTRACTOR_PATH := "res://addons/coldrock-gdgist/pro/GdGistCodeExtractor.gd"
+static var PRO_INIT_PATH      := "res://addons/coldrock-gdgist/pro/GdGistProInit.gd"
+static var PRO_MANAGER_PATH   := "res://addons/coldrock-gdgist/pro/GdGistProManager.gd"
+static var PRO_RUNNER_PATH    := "res://addons/coldrock-gdgist/pro/GdGistScriptRunner.gd"
+static var PRO_EXTRACTOR_PATH := "res://addons/coldrock-gdgist/pro/GdGistCodeExtractor.gd"
 
 const PRO_ITCH_HOME      := "https://coldrockgames.itch.io/gdgist"
 ## The region of the editor window.
@@ -590,7 +590,7 @@ class GdGistContextMenu extends EditorContextMenuPlugin:
 			return
 		var selected_text:String = code_edit.text
 		# dynamic call to the pro version
-		var extractor_script := load(PRO_EXTRACTOR_PATH) as GDScript
+		var extractor_script := load(GDGistPlugin.PRO_EXTRACTOR_PATH) as GDScript
 		if not extractor_script:
 			return
 		var virtuals:Array[Dictionary] = extractor_script.call("extract_virtuals", selected_text)
