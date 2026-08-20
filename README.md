@@ -11,7 +11,7 @@ Make sure to look at the documentation in the [wiki](https://github.com/coldrock
 
 # GDGist Community Edition
 
-![Godot Version](https://img.shields.io/badge/Godot-4.6+-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg) ![Version](https://img.shields.io/badge/GDGist_Version-2608.4-orange)
+![Godot Version](https://img.shields.io/badge/Godot-4.6+-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg) ![Version](https://img.shields.io/badge/Version-2608.4-orange)
 
 [Get the latest release](https://github.com/coldrockgames/god-gdgist-community/releases/latest)
 
