@@ -30,7 +30,8 @@ right_icon = SubResource("DPITexture_pfb7m")
 [node name="RefreshButton" type="Button" parent="HBoxContainer" unique_id=402890165]
 unique_name_in_owner = true
 layout_mode = 2
-tooltip_text = "Refresh View"
+tooltip_text = "Refresh View
+(Use Ctrl-Click to force-refresh from FileSystem)"
 icon = SubResource("DPITexture_pfb7m")
 flat = true
 

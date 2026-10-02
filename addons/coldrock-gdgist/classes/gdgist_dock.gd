@@ -83,7 +83,7 @@ func _on_folder_created(parent_item: TreeItem, folder_name: String, is_global: b
 
 
 func refresh_tree(use_cache:bool = false, focus_key:String = "") -> void:
-	if not is_inside_tree() or _is_loading_state:
+	if not is_inside_tree() or (_is_loading_state and not Input.is_key_pressed(KEY_CTRL)):
 		return
 	_is_loading_state = true
 	var saved_selections:Array[String] = []

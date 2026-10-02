@@ -40,12 +40,19 @@ func request_variables(vars: Array[String], code: String) -> Dictionary:
 		child.queue_free()
 	_edits.clear()
 	var first_edit: LineEdit = null
-	for v in vars:
+	for v:String in vars:
 		var hbox := HBoxContainer.new()
 		var lbl := Label.new()
-		lbl.text = v + ":"
+		var vname := v
+		var vdefault := ""
+		if v.contains("="):
+			var sa := v.split("=", true)
+			vname = sa[0]
+			vdefault = sa[sa.size() - 1]
+		lbl.text = vname + ":"
 		lbl.custom_minimum_size = Vector2(180, 0)
 		var edit := LineEdit.new()
+		edit.text = vdefault
 		edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		edit.text_submitted.connect(_on_text_submitted)
 		edit.text_changed.connect(_on_edit_text_changed)
@@ -60,6 +67,7 @@ func request_variables(vars: Array[String], code: String) -> Dictionary:
 	popup_centered(Vector2(600, 0))
 	if first_edit:
 		first_edit.grab_focus()
+		first_edit.select_all()
 	var result: Dictionary = await variables_resolved
 	return result
 
@@ -76,7 +84,7 @@ func _on_confirmed() -> void:
 		var val: String = _edits[v].text.strip_edges()
 		#if val.is_empty():
 			#val = v
-		result[v] = val
+		result[v] = _resolve_type_syntax(val)
 	variables_resolved.emit(result)
 
 
@@ -94,5 +102,39 @@ func _update_preview() -> void:
 		var val: String = _edits[v].text.strip_edges()
 		if val.is_empty():
 			val = v
-		current_code = current_code.replace("!>" + v + "<!", val)
+		current_code = current_code.replace("!>" + v + "<!", _resolve_type_syntax(val))
 	_preview_edit.text = current_code
+
+
+func _resolve_type_syntax(varstr:String) -> String:
+	var rv:String = varstr
+	if rv.contains(":"):
+		# special syntax: extract names from another variable
+		# starts with ":" followed by the variable name to extract from
+		# example: "!>mylist=:myargs<!"
+		var colon_pos := rv.find(":")
+		var prefix := ""
+		if colon_pos > 0:
+			prefix = rv.substr(0, colon_pos)
+		var suffix := ""
+		var from_var:String = rv.substr(colon_pos + 1)
+		if from_var.contains(","):
+			var pos := from_var.find(",")
+			suffix = from_var.substr(pos)
+			from_var = from_var.trim_suffix(suffix).strip_edges()
+		elif from_var.contains(" "):
+			var pos := from_var.find(" ")
+			suffix = from_var.substr(pos)
+			from_var = from_var.trim_suffix(suffix).strip_edges()
+		var from_textbox:LineEdit = _edits.get(from_var, null)
+		if from_textbox:
+			rv = prefix
+			var from_text:String = from_textbox.text
+			var words := from_text.split(",", false)
+			for w:String in words:
+				var parts := w.split(":", false)
+				rv = rv + (", " if not rv.is_empty() else "") + parts[0].strip_edges()
+				rv = rv.replacen(",,", ",")
+			rv = rv.trim_suffix(", ")
+			rv += suffix
+	return rv

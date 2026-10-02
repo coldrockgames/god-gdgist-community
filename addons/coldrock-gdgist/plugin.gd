@@ -61,6 +61,16 @@ var SETTINGS := {
 		"hint": PROPERTY_HINT_FILE,
 		"hint_string": "*.tres,*.res"
 	},
+	"shortcuts/insert_super_call": {
+		"editor": true,
+		"restart": true,
+		"resource": true,
+		"res_store_in": "_super_shortcut",
+		"default": "res://addons/coldrock-gdgist/res/gdgist_super_shortcut.tres",
+		"type": TYPE_STRING,  
+		"hint": PROPERTY_HINT_FILE,
+		"hint_string": "*.tres,*.res"
+	},
 }
 
 # Definition of all autoload singletons.
@@ -86,8 +96,6 @@ var _editor_dialog: GdGistEditor
 var _extractor_dialog:ConfirmationDialog
 var _context_menu_plugin:GdGistContextMenu
 var _variable_dialog: GdGistVariableDialog
-var _quick_pick_instance:Control
-
 
 #region pro edition init
 func _detect_pro_version() -> bool:
@@ -179,8 +187,10 @@ func _remove_export_plugin() -> void:
 #endregion
 
 #region editor shortcuts
+var _super_shortcut_res:Shortcut = load("res://addons/coldrock-gdgist/res/gdgist_super_shortcut.tres")
 var shortcut_res:Shortcut = load("res://addons/coldrock-gdgist/res/gdgist_editor_shortcut.tres")
 var _shortcut:Shortcut
+var _super_shortcut:Shortcut
 var _quick_menu:PopupMenu
 var _menu_mapping:Array[Dictionary] = []
 
@@ -191,6 +201,8 @@ func _shortcut_input(event:InputEvent) -> void:
 	if _shortcut.matches_event(event):
 		_show_insert_gist_popup()
 		get_viewport().set_input_as_handled()
+	elif _super_shortcut.matches_event(event):
+		_context_menu_plugin.insert_super_call(null)
 
 
 func _show_insert_gist_popup() -> void:
@@ -458,10 +470,7 @@ func _insert_snippet_to_editor(content: String, line: int, col: int) -> void:
 	var code_edit := _get_code_editor()
 	if not code_edit:
 		return
-	if Input.is_key_pressed(KEY_CTRL):
-		code_edit.text = content
-		code_edit.grab_focus()
-		return
+	var full_replace:bool = Input.is_key_pressed(KEY_CTRL)
 	var regex := RegEx.new()
 	regex.compile(r"!>(.*?)<!")
 	var matches := regex.search_all(content)
@@ -469,11 +478,7 @@ func _insert_snippet_to_editor(content: String, line: int, col: int) -> void:
 	for m in matches:
 		var v := m.get_string(1)
 		var_counts[v] = var_counts.get(v, 0) + 1
-	var needs_dialog := false
-	if var_counts.size() > 1:
-		needs_dialog = true
-	elif var_counts.size() == 1 and var_counts.values()[0] > 1:
-		needs_dialog = true
+	var needs_dialog := var_counts.size() > 0
 	var final_content := content
 	if needs_dialog:
 		var unique_vars: Array[String] = []
@@ -484,6 +489,10 @@ func _insert_snippet_to_editor(content: String, line: int, col: int) -> void:
 		for v in replacements:
 			final_content = final_content.replace("!>" + v + "<!", replacements[v])
 	var data := _process_placeholders(final_content)
+	if full_replace:
+		code_edit.text = data.clean_text
+		code_edit.grab_focus()
+		return
 	code_edit.begin_complex_operation()
 	code_edit.insert_text(data.clean_text, line, col)
 	if data.offset != -1:
@@ -552,6 +561,10 @@ class GdGistContextMenu extends EditorContextMenuPlugin:
 		var code_edit:CodeEdit = node as CodeEdit
 		if not code_edit:
 			return
+		if is_in_empty_func(code_edit):
+			var sig:String = get_super_call_signature(code_edit)
+			if not sig.is_empty():
+				add_context_menu_item("Insert %s"%sig, insert_super_call, load("res://addons/coldrock-gdgist/icons/sprSuperCall.png"))
 		if code_edit.has_selection():
 			add_context_menu_item("Create Project Gist from Selection", _on_create_project_gist)
 			if GdgistFeatureBroker.has_feature("p_global_gists"):
@@ -633,6 +646,120 @@ class GdGistContextMenu extends EditorContextMenuPlugin:
 
 	func _on_insert_gist(data:Variant) -> void:
 		_plugin._show_insert_gist_popup()
+	
+	#region super-call generator
+	func is_in_empty_func(code_edit:CodeEdit) -> bool:
+		if not code_edit:
+			return false
+		var current_line:int = code_edit.get_caret_line()
+		if not code_edit.get_line(current_line).strip_edges().is_empty():
+			return false
+		var func_decl:String = _extract_func_declaration(code_edit)
+		if func_decl.is_empty() or func_decl.begins_with("static "):
+			return false
+		return func_decl.begins_with("func ") and func_decl.ends_with(":")
+
+
+	func _extract_func_declaration(code_edit:CodeEdit) -> String:
+		var target_line:int = code_edit.get_caret_line() - 1
+		var func_decl:String = ""
+		while target_line >= 0:
+			var text:String = code_edit.get_line(target_line).strip_edges()
+			if not text.is_empty():
+				func_decl = text + " " + func_decl
+				if text.begins_with("func ") or text.begins_with("static func "):
+					break
+			target_line -= 1
+		return func_decl.strip_edges()
+
+
+	func get_super_call_signature(code_edit:CodeEdit) -> String:
+		if not is_in_empty_func(code_edit):
+			return ""
+		var current_line:int = code_edit.get_caret_line()
+		var target_line:int = current_line - 1
+		var func_decl:String = ""
+		while target_line >= 0:
+			var text:String = code_edit.get_line(target_line).strip_edges()
+			if not text.is_empty():
+				func_decl = text + " " + func_decl
+				if text.begins_with("func "):
+					break
+			target_line -= 1
+		var regex:RegEx = RegEx.create_from_string(r"func\s+(?<name>\w+)")
+		var result:RegExMatch = regex.search(func_decl)
+		if not result:
+			return ""
+		return "super.%s(...)" % result.get_string("name")
+
+
+	func insert_super_call(_data:Variant) -> void:
+		var script_editor:ScriptEditor = EditorInterface.get_script_editor()
+		var current_editor = script_editor.get_current_editor()
+		if not current_editor:
+			return
+		var code_edit:CodeEdit = current_editor.get_base_editor() as CodeEdit
+		if not code_edit:
+			return
+		if not is_in_empty_func(code_edit):
+			return
+		var func_decl:String = _extract_func_declaration(code_edit)
+		var regex:RegEx = RegEx.create_from_string(r"func\s+(?<name>\w+)\s*\((?<params>.*)\)(?:\s*->\s*(?<return_type>[^:]+))?\s*:")
+		var result:RegExMatch = regex.search(func_decl)
+		if not result:
+			return
+		var func_name:String = result.get_string("name")
+		var raw_params:String = result.get_string("params")
+		var return_type:String = result.get_string("return_type").strip_edges()
+		var param_names:Array[String] = _extract_param_names(raw_params)
+		var args_str:String = ", ".join(param_names)
+		var current_line:int = code_edit.get_caret_line()
+		var raw_line:String = code_edit.get_line(current_line)
+		var indent_prefix:String = raw_line.left(raw_line.length() - raw_line.strip_edges(true, false).length())
+		if return_type == "void":
+			code_edit.insert_text_at_caret("super.%s(%s)" % [func_name, args_str])
+			return
+		var var_decl:String = ""
+		if return_type.is_empty() or return_type == "Variant":
+			var_decl = "var rv = super.%s(%s)" % [func_name, args_str]
+		else:
+			var_decl = "var rv:%s = super.%s(%s)" % [return_type, func_name, args_str]
+		var full_block:String = "%s\n%s\n%sreturn rv" % [var_decl, indent_prefix, indent_prefix]
+		code_edit.insert_text_at_caret(full_block)
+		code_edit.set_caret_line(current_line + 1)
+		code_edit.set_caret_column(indent_prefix.length())
+
+
+	func _extract_param_names(raw_params:String) -> Array[String]:
+		var names:Array[String] = []
+		if raw_params.strip_edges().is_empty():
+			return names
+		var current_token:String = ""
+		var depth:int = 0
+		var tokens:Array[String] = []
+		for i:int in raw_params.length():
+			var char:String = raw_params[i]
+			if char in ["(", "[", "{"]:
+				depth += 1
+				current_token += char
+			elif char in [")", "]", "}"]:
+				depth -= 1
+				current_token += char
+			elif char == "," and depth == 0:
+				tokens.append(current_token.strip_edges())
+				current_token = ""
+			else:
+				current_token += char
+		if not current_token.strip_edges().is_empty():
+			tokens.append(current_token.strip_edges())
+		var name_regex:RegEx = RegEx.create_from_string(r"^\s*(?:var\s+)?(?<param_name>\w+)")
+		for token:String in tokens:
+			var match:RegExMatch = name_regex.search(token)
+			if match:
+				names.append(match.get_string("param_name"))
+		return names
+	#endregion
+
 #endregion
 
 #region --- Generic Settings Management ---

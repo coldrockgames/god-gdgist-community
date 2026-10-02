@@ -54,6 +54,7 @@ func _validate_save_button(_text:String = "") -> void:
 
 ## Opens the editor for a brand new gist.
 func open_for_new(is_global:bool, default_class:String = "", initial_code: String = "", folder_path:String = "") -> void:
+	console_wrapper.visible = false
 	_is_global_scope = is_global
 	_original_file_path = ""
 	var name_suggest:String = initial_code.strip_edges()
@@ -94,6 +95,7 @@ func open_for_new(is_global:bool, default_class:String = "", initial_code: Strin
 
 ## Opens the editor to modify an existing gist.
 func open_for_edit(gist:Dictionary, is_global:bool) -> void:
+	console_wrapper.visible = false
 	_is_global_scope = is_global
 	_original_file_path = gist.get("file_path", "")
 	var folder:String = gist.get("folder", "")
