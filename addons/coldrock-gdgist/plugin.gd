@@ -138,7 +138,7 @@ static func get_default_global_path() -> String:
 
 func _enter_tree() -> void:
 	_detect_pro_version()
-	var sw := StopWatch.new("Coldrock " + PLUGIN_NAME + (" Pro" if is_pro_version else ""))
+	var sw = _try_create_stopwatch("Coldrock " + PLUGIN_NAME + (" Pro" if is_pro_version else ""))
 	# Do not remove these!
 	_inject_pro_features()
 	GdGistManager.load_ui_state()
@@ -150,7 +150,7 @@ func _enter_tree() -> void:
 	_add_dock_panel()
 	_setup_export_plugin()
 	get_editor_dimensions()
-	sw.finish("plugin initialized in")
+	if sw: sw.finish("plugin initialized in")
 
 
 func _exit_tree() -> void:
@@ -173,6 +173,18 @@ func _notification(what:int) -> void:
 func _on_settings_changed() -> void:
 	pass # NOTE: This is called VERY frequently when project settings are open!
 
+
+#region stopwatch (if available)
+static func _try_create_stopwatch(sw_name:String = "") -> Object:
+	for class_info:Dictionary in ProjectSettings.get_global_class_list():
+		if class_info.get("class", "") == "StopWatch":
+			var script_path:String = class_info.get("path", "")
+			if ResourceLoader.exists(script_path):
+				var sw_script:Script = load(script_path) as Script
+				if sw_script:
+					return sw_script.new(sw_name if not sw_name.is_empty() else "Coldrock " + PLUGIN_NAME)
+	return null
+#endregion
 
 #region export management
 func _setup_export_plugin() -> void:
