@@ -1,17 +1,16 @@
-<p align="center">
-<img src="https://github.com/coldrockgames/god-gdgist-community/blob/ccf4463b456430992316b7ed6536587c184de2c5/assets/gdgist-logo-trans-256.png"/>
-</p>
+<img src="https://github.com/coldrockgames/god-gdgist-community/blob/0c3b4880ccc9d8a5b6d37e9880c90e78a16d4ceb/assets/repo-banner-960x128.png"/>
 
-> [!NOTE]
-> **Giving Back to the Engine:** As a passionate Godot developer, I will donate **20% of all GDGist Pro net revenues** directly to the [Godot Development Fund](https://fund.godotengine.org/). By upgrading your IDE workflow, you are also actively supporting the future of the engine we all rely on.\
-> *I am not affiliated in any way with the Godot Foundation. This is just my way to say "Thank you" to the makers of Godot!*
+![Godot Version](https://img.shields.io/badge/Godot-4.6+-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg) ![Version](https://img.shields.io/badge/Version-2610.1-orange)
+
+|||
+|:-:|---|
+|<img width="256" height="256" alt="itch-cover" src="https://github.com/coldrockgames/god-gdgist-community/blob/ccf4463b456430992316b7ed6536587c184de2c5/assets/gdgist-logo-trans-256.png" />|**Giving Back to the Engine:** <br/>As a passionate Godot developer, I will donate **20% of all GDGist Pro net revenues**<br/>directly to the [Godot Development Fund](https://fund.godotengine.org/).<br/><br/>By upgrading your IDE workflow, you are also actively supporting the future of the engine we all rely on.<br/><br/>*I am not affiliated in any way with the Godot Foundation.<br/>This is just my way to say "Thank you" to the makers of Godot!*|
+|||
 
 # Wiki Documentation
 Make sure to look at the documentation in the [wiki](https://github.com/coldrockgames/god-gdgist-community/wiki) for a comprehensive explanation of the features of GDGist!
 
 # GDGist Community Edition
-
-![Godot Version](https://img.shields.io/badge/Godot-4.6+-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg) ![Version](https://img.shields.io/badge/Version-2610.1-orange)
 
 [Get the latest release](https://github.com/coldrockgames/god-gdgist-community/releases/latest)
 
