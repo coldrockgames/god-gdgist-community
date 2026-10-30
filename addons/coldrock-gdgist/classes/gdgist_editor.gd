@@ -22,6 +22,7 @@ var _run_button: Button
 func _ready() -> void:
 	confirmed.connect(_on_confirmed)
 	canceled.connect(_on_canceled)
+	dialog_hide_on_ok = false
 	_edit_name.text_changed.connect(_validate_save_button)
 	_edit_name.text_submitted.connect(_on_text_submitted)
 	_edit_class.text_submitted.connect(_on_text_submitted)
@@ -35,6 +36,7 @@ func _ready() -> void:
 	_edit_code.text_changed.connect(_update_run_button_visibility)
 	console_clear.icon = get_theme_icon("Clear", "EditorIcons")
 	console_close.icon = get_theme_icon("Close", "EditorIcons")
+	get_ok_button().icon = get_theme_icon("Save", "EditorIcons")
 	GdgistFeatureBroker.scan_ui(self)
 
 

@@ -414,7 +414,7 @@ func _on_editor_script_changed(_script: Script) -> void:
 
 
 func _attach_gist_drop_zone(code_edit: CodeEdit) -> void:
-	if not code_edit or code_edit.has_node("GDGistDropZone"):
+	if not code_edit or code_edit.has_node(^"GDGistDropZone"):
 		return
 	var drop_zone := Control.new()
 	drop_zone.name = "GDGistDropZone"

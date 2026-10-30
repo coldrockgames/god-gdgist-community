@@ -108,7 +108,9 @@ func _update_preview() -> void:
 
 func _resolve_type_syntax(varstr:String) -> String:
 	var rv:String = varstr
-	if rv.contains(":"):
+	var last_rv:String = ""
+	while rv.contains(":") and last_rv != rv:
+		last_rv = rv
 		# special syntax: extract names from another variable
 		# starts with ":" followed by the variable name to extract from
 		# example: "!>mylist=:myargs<!"
@@ -129,12 +131,6 @@ func _resolve_type_syntax(varstr:String) -> String:
 		var from_textbox:LineEdit = _edits.get(from_var, null)
 		if from_textbox:
 			rv = prefix
-			var from_text:String = from_textbox.text
-			var words := from_text.split(",", false)
-			for w:String in words:
-				var parts := w.split(":", false)
-				rv = rv + (", " if not rv.is_empty() else "") + parts[0].strip_edges()
-				rv = rv.replacen(",,", ",")
-			rv = rv.trim_suffix(", ")
+			rv += GDGistCodeExtractor.extract_param_names(from_textbox.text)
 			rv += suffix
 	return rv

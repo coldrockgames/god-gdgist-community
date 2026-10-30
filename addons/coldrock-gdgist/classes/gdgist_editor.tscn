@@ -15,8 +15,9 @@ position = Vector2i(266, 65)
 size = Vector2i(800, 600)
 maximize_disabled = false
 ok_button_text = "  Save Gist  "
+dialog_hide_on_ok = false
 dialog_close_on_escape = false
-cancel_button_text = "  Cancel  "
+cancel_button_text = "  Close  "
 script = ExtResource("1_2hbrg")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=9174700]

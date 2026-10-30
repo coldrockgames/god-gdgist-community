@@ -105,6 +105,7 @@ func refresh_tree(use_cache:bool = false, focus_key:String = "") -> void:
 	if GdgistFeatureBroker.has_feature("p_global_gists"):
 		var global_node:TreeItem = _create_node(root, "Global Gists", true, global_col_folder, false)
 		await _populate_scope(global_node, true, use_cache)
+		_sort_tree_node(global_node)
 	if not saved_selections.is_empty():
 		_restore_tree_selection(root, saved_selections)
 	await get_tree().process_frame
@@ -378,4 +379,36 @@ func _drop_data_tree(at_position: Vector2, data: Variant) -> void:
 		if not target_path.is_empty():
 			focus_key += "/" + target_path
 		refresh_tree(false, focus_key)
+#endregion
+
+#region helpers
+func _sort_tree_node(parent:TreeItem) -> void:
+	if not parent:
+		return
+	var children:Array[TreeItem] = []
+	var child:TreeItem = parent.get_first_child()
+	while child:
+		children.append(child)
+		child = child.get_next()
+	
+	if children.is_empty():
+		return
+	children.sort_custom(func(a: TreeItem, b: TreeItem) -> bool:
+		var a_is_folder: bool = a.get_metadata(0) == null
+		var b_is_folder: bool = b.get_metadata(0) == null
+		if a_is_folder != b_is_folder:
+			return a_is_folder
+		var a_text: String = a.get_text(0)
+		var b_text: String = b.get_text(0)
+		var a_sub: bool = a_text.begins_with("_")
+		var b_sub: bool = b_text.begins_with("_")
+		if a_sub != b_sub:
+			return a_sub
+		return a_text.naturalnocasecmp_to(b_text) < 0
+	)
+	for i:int in range(1, children.size()):
+		children[i].move_after(children[i - 1])
+	for c:TreeItem in children:
+		if c.get_metadata(0) == null:
+			_sort_tree_node(c)
 #endregion

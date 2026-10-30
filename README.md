@@ -1,6 +1,6 @@
 <img src="https://github.com/coldrockgames/god-gdgist-community/blob/0c3b4880ccc9d8a5b6d37e9880c90e78a16d4ceb/assets/repo-banner-960x128.png"/>
 
-![Godot Version](https://img.shields.io/badge/Godot-4.6+-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg) ![Version](https://img.shields.io/badge/Version-2610.1-orange)
+![Godot Version](https://img.shields.io/badge/Godot-4.6+-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg) ![Version](https://img.shields.io/badge/Version-2610.2-orange)
 
 |||
 |:-:|---|
