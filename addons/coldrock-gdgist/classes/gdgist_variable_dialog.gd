@@ -129,8 +129,9 @@ func _resolve_type_syntax(varstr:String) -> String:
 			suffix = from_var.substr(pos)
 			from_var = from_var.trim_suffix(suffix).strip_edges()
 		var from_textbox:LineEdit = _edits.get(from_var, null)
-		if from_textbox:
+		var extractor_script := load(GDGistPlugin.PRO_EXTRACTOR_PATH) as GDScript
+		if extractor_script and from_textbox:
 			rv = prefix
-			rv += GDGistCodeExtractor.extract_param_names(from_textbox.text)
+			rv += extractor_script.call("extract_param_names", from_textbox.text)
 			rv += suffix
 	return rv

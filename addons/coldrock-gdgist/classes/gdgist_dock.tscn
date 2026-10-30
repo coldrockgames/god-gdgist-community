@@ -1,10 +1,9 @@
 [gd_scene format=3 uid="uid://2cgw8vddogi8"]
 
 [ext_resource type="Script" uid="uid://bsl4xc6vxg78j" path="res://addons/coldrock-gdgist/classes/gdgist_dock.gd" id="1_h5dxy"]
-[ext_resource type="Texture2D" uid="uid://cedw2go2yhivw" path="res://addons/coldrock-toolbox/assets/icons/sprReset.png" id="2_h5dxy"]
 [ext_resource type="Script" uid="uid://bq2d2ogf3rc46" path="res://addons/coldrock-gdgist/classes/tree_control.gd" id="5_f3hwl"]
 
-[sub_resource type="DPITexture" id="DPITexture_advyu"]
+[sub_resource type="DPITexture" id="DPITexture_pfb7m"]
 _source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#ff5d5d\" d=\"M2 1v8.586l1.293-1.293a1 1 0 0 1 1.414 0L7 10.587l2.293-2.293a1 1 0 0 1 1.414 0L13 10.586l1-1V6H9V1H2zm8 0v4h4zm-6 9.414-2 2V15h12v-2.586l-.293.293a1 1 0 0 1-1.414 0L10 10.414l-2.293 2.293a1 1 0 0 1-1.414 0L4 10.414z\"/></svg>
 "
 
@@ -26,14 +25,14 @@ layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Filter Gists"
 clear_button_enabled = true
-right_icon = SubResource("DPITexture_advyu")
+right_icon = SubResource("DPITexture_pfb7m")
 
 [node name="RefreshButton" type="Button" parent="HBoxContainer" unique_id=402890165]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Refresh View
 (Use Ctrl-Click to force-refresh from FileSystem)"
-icon = ExtResource("2_h5dxy")
+icon = SubResource("DPITexture_pfb7m")
 flat = true
 
 [node name="UpgradeButton" type="Button" parent="HBoxContainer" unique_id=94912897]
@@ -42,7 +41,7 @@ visible = false
 layout_mode = 2
 tooltip_text = "Get the Pro version
 (Opens a web browser to itch.io)"
-icon = SubResource("DPITexture_advyu")
+icon = SubResource("DPITexture_pfb7m")
 flat = true
 
 [node name="Tree" type="Tree" parent="." unique_id=2045035324]
